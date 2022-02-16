@@ -12,6 +12,7 @@ TagManager:
   - PaddleTwo
   - PaddleOne
   - Suprise
+  - Speed up
   layers:
   - Default
   - TransparentFX

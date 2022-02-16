@@ -133,6 +133,13 @@ public class Ball : MonoBehaviour
             }
             other.gameObject.SetActive(false);
         }
+
+        if (other.gameObject.CompareTag("Speed up"))
+        {
+            //Debug.Log("hit");
+            rb.velocity = new Vector3(rb.velocity.x , rb.velocity.y, rb.velocity.z + 5.0f);
+            other.gameObject.SetActive(false);
+        }
     }
 
 }

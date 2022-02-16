@@ -14,6 +14,7 @@ public class Spawn : MonoBehaviour
     private GameObject paddleOne;
     private GameObject paddleTwo;
     private GameObject Suprise;
+    private GameObject SpeedUp;
 
     // Start is called before the first frame update
     void Start()
@@ -23,7 +24,7 @@ public class Spawn : MonoBehaviour
         paddleOne = GameObject.FindGameObjectWithTag("PaddleOne");
         paddleTwo = GameObject.FindGameObjectWithTag("PaddleTwo");
         Suprise = GameObject.FindGameObjectWithTag("Suprise");
-
+        SpeedUp = GameObject.FindGameObjectWithTag("Speed up");
 
     }
 
@@ -53,7 +54,7 @@ public class Spawn : MonoBehaviour
             SpawnBall();
 
             Suprise.SetActive(true);
-
+            SpeedUp.SetActive(true);
         }
     }
 }
