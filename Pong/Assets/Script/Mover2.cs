@@ -5,11 +5,15 @@ using UnityEngine;
 public class Mover2 : MonoBehaviour
 {
     public float movementPerSecond = 1f;
-    public AudioClip pongSound;
+    public AudioClip[] pongSound;
+
+    private GameObject ball;
+    private Rigidbody rb;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -27,10 +31,20 @@ public class Mover2 : MonoBehaviour
     }
     void OnCollisionEnter(Collision collision)
     {
+        ball = GameObject.FindGameObjectWithTag("Ball");
+        rb = ball.GetComponent<Rigidbody>();
+
         if (collision.gameObject.CompareTag("Ball"))
         {
             AudioSource audioSource = GetComponent<AudioSource>();
-            audioSource.clip = pongSound;
+            if (rb.velocity.z < -20f) { 
+                audioSource.clip = pongSound[0];
+            }
+            else
+            {
+                audioSource.clip = pongSound[1];
+            }
+            Debug.Log(rb.velocity.z);
             audioSource.Play();
         }
 
