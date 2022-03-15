@@ -9,6 +9,8 @@ public class Bullet : MonoBehaviour
   private Player mPlayer;
   private EnemyController mEnemyController;
 
+  private Animator mAnimator;
+  private GameObject destoryObject;
 
   public float speed = 5;
 
@@ -27,6 +29,7 @@ public class Bullet : MonoBehaviour
 
        mEnemyController = GameObject.Find("Enemy").GetComponent<EnemyController>();
 
+
     }
 
     // Update is called once per frame
@@ -34,6 +37,8 @@ public class Bullet : MonoBehaviour
     {
       myRigidbody2D.velocity = Vector2.up * speed; 
     }
+
+
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -58,11 +63,12 @@ public class Bullet : MonoBehaviour
         {
             mPlayer.addScore(10);
         }
-
         if (!Object.CompareTag("Player"))
         {
+            mAnimator = Object.GetComponent<Animator>();
+            mAnimator.SetTrigger("Dead");
+            Object.SendMessage("PlaySound" );
             Destroy(mBullet);
-            Destroy(Object);
         }
 
         if(mPlayer.getScore() > mPlayer.getSpeedUp())
@@ -76,5 +82,10 @@ public class Bullet : MonoBehaviour
 
             //Debug.Log(mPlayer.getScore().ToString() + " " + mPlayer.getSpeedUp().ToString());
         }
+
     }
+
+
+
+
 }

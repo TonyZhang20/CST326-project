@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class EnemyBullet : MonoBehaviour
 {
     public float speed;
+    
     // Start is called before the first frame update
     private Rigidbody2D myRigidbody2D;
 
@@ -31,7 +33,10 @@ public class EnemyBullet : MonoBehaviour
         if(collision.gameObject.CompareTag("Player"))
         {
             Debug.Log("You Lose!");
-            Destroy(collision.gameObject);
+            var Animator = collision.gameObject.GetComponent<Animator>();
+            Animator.SetTrigger("Dead");
+
+            GameObject.Find("Player").SendMessage("MPlaySound");
         }
     }
 }

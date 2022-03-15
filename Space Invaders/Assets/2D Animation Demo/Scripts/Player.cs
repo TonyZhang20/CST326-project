@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class Player : MonoBehaviour
@@ -14,16 +15,22 @@ public class Player : MonoBehaviour
     public TextMeshProUGUI HI_ScoreGUI;
     public TextMeshProUGUI ScoreGUI;
 
+    public AudioClip[] PlayerSound;
+
     private float Score;
     private float HI_Score;
 
     private GameObject mBullet;
+
+    private Animator PlayerAnimator;
 
     private void Start()
     {
         Score = 0;
         HI_Score = PlayerPrefs.GetFloat("Highest");
         ShowScore(HI_Score, HI_ScoreGUI);
+
+        PlayerAnimator = GetComponent<Animator>();
     }
     void Update()
     {
@@ -33,6 +40,10 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && mBullet == null)
         {
             GameObject shot = Instantiate(bullet, shottingOffset.position, Quaternion.identity);
+            PlayerAnimator.SetTrigger("Shoot");
+            var audioSource = GetComponent<AudioSource>();
+            audioSource.clip = PlayerSound[0];
+            audioSource.Play();
             Destroy(shot, 2f);
          }
 
@@ -63,6 +74,10 @@ public class Player : MonoBehaviour
             ShowScore(mScore, HI_ScoreGUI);
             HI_Score = mScore;
             PlayerPrefs.SetFloat("Highest", HI_Score);
+        }
+        else
+        {
+            PlayerPrefs.SetFloat("YourScore", mScore);
         }
     }
 
@@ -103,5 +118,18 @@ public class Player : MonoBehaviour
     public void setSpeedUpScore(float data)
     {
         SpeedUpScore = data;
+    }
+
+    public void MDestory()
+    {
+        Destroy(this.gameObject);
+        SceneManager.LoadScene(2);
+    }
+
+    public void MPlaySound()
+    {
+        var AudioSource = GetComponent<AudioSource>();
+        AudioSource.clip = PlayerSound[1];
+        AudioSource.Play();
     }
 }
