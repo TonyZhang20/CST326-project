@@ -57,8 +57,9 @@ public class EnemyDemo : MonoBehaviour
             Vector3 movementDir = (targetPosition - transform.position).normalized;
             transform.position += movementDir * speed * Time.deltaTime;
             Vector3 targetToEnemy =(transform.position - targetPosition).normalized;
-            var wayPointLeft = new Vector3( -25f, wayPointList[targetWaypointIndex].position.y, wayPointList[targetWaypointIndex].position.z);
-            float dotResult = Vector3.Dot(targetToEnemy, wayPointLeft);
+            var wayPointLeft = new Vector3(wayPointList[targetWaypointIndex].position.x - 10f, wayPointList[targetWaypointIndex].position.y, wayPointList[targetWaypointIndex].position.z);
+            var fromLeftToWayPoint = (wayPointLeft - wayPointList[targetWaypointIndex].position).normalized;
+            float dotResult = Vector3.Dot(targetToEnemy, fromLeftToWayPoint);
             //Debug.Log(dotResult);
             checkDirection(dotResult);
         }
