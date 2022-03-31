@@ -11,10 +11,16 @@ public class Tower : MonoBehaviour
 
     private float accumulatedTime = 0f;
     private float totalTime = 0f;
+
+    private float particleTime = 2f;
+    private float countParticle = 0f;
+
+    private ParticleSystem ParticleSystem;
     // Start is called before the first frame update
     void Start()
     {
-        
+        ParticleSystem = transform.Find("Sphere").transform.Find("SmallExplosion").GetComponent<ParticleSystem>();
+        ParticleSystem.Stop();
     }
 
     // Update is called once per frame
@@ -50,8 +56,13 @@ public class Tower : MonoBehaviour
             {
                 totalTime = 2.5f;
                 Fire((EnemyList[0]));
+                if(ParticleSystem.isStopped)
+                {
+                    ParticleSystem.Play();
+                }
             }
         }
+
 
     }
 
