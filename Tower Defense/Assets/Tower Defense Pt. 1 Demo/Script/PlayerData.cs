@@ -40,7 +40,6 @@ public class PlayerData : MonoBehaviour
     {
         Economy -= spend;
         showMoney();
-        Debug.Log(Economy);
     }
 
     public void takeDamage(float damage)
@@ -69,7 +68,6 @@ public class PlayerData : MonoBehaviour
     void showMoney()
     {
         Money.text = "Money: " + Economy;
-        Debug.Log(Money);
     }
 
     void showHealth()

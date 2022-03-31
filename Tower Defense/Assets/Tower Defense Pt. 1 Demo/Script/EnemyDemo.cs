@@ -21,11 +21,16 @@ public class EnemyDemo : MonoBehaviour
     public Transform[] TargetList;
     public Transform[] TargetListT;
     public Transform Target;
+
+    public AudioClip audioClip;
+
     private NavMeshAgent agent;
 
     private Transform[] currentList;
 
     private Vector3 TargetPosition;
+
+    AudioSource audioSource;
     //-----------------------------------------------------------------------------
     void Start()
     {
@@ -52,16 +57,19 @@ public class EnemyDemo : MonoBehaviour
         slider.value = CalculateHealth();
 
         healthBarUI.SetActive(false);
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     //-----------------------------------------------------------------------------
     void Update()
     {
-        
+
         slider.value = CalculateHealth();
         
         if(health < MaxHealth)
         {
+            audioSource.Play();
             healthBarUI.SetActive(true);
         }
 
@@ -82,10 +90,14 @@ public class EnemyDemo : MonoBehaviour
             agent.speed = 4;
         }
 
+
         if(health <= 0)
         {
-            animator.SetTrigger("Death");
+            AudioSource source = GetComponent<AudioSource>();
+            source.clip = audioClip;
+            source.Play();
             agent.speed = 0;
+            animator.SetTrigger("Death");
         }
     }
 
@@ -98,8 +110,9 @@ public class EnemyDemo : MonoBehaviour
     }
     public void Death(float worthCoin)
     {
-        Destroy(gameObject);
         Player.GetComponent<PlayerData>().SendMessage("addMoney", coinWorth);
+        
+        Destroy(gameObject);
     }
 
     Vector3 GetNaveMeshPosition(Vector3 samplePosition)

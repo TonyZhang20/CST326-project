@@ -67,7 +67,6 @@ public class CameraRotation : MonoBehaviour
                     else
                     {
                         textMeshProUGUI.gameObject.SetActive(true);
-                        Debug.Log("Fail to Building Tower");
                     }
 
                 }

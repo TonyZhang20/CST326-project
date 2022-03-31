@@ -7,13 +7,13 @@ public class Tower : MonoBehaviour
 { 
     public GameObject Bullet;
     public float Speed;
+
+    public AudioClip audioClip;
+
     private List<GameObject> EnemyList = new List<GameObject>();
 
     private float accumulatedTime = 0f;
     private float totalTime = 0f;
-
-    private float particleTime = 2f;
-    private float countParticle = 0f;
 
     private ParticleSystem ParticleSystem;
     // Start is called before the first frame update
@@ -99,6 +99,9 @@ public class Tower : MonoBehaviour
     {
         var mBullet = Instantiate(Bullet, transform.Find("Fire").position, Quaternion.identity);
         mBullet.GetComponent<Bullet>().GetTarget(EnemyList[0]);
+        
+        var AudioSource = GetComponent<AudioSource>();
+        AudioSource.Play();
     }
 
 
