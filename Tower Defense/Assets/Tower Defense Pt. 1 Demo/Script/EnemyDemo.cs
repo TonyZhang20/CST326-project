@@ -1,90 +1,99 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class EnemyDemo : MonoBehaviour
 {
-    // todo #1 set up properties
-    //   health, speed, coin worth
-    //   waypoints
-    //   delegate event for outside code to subscribe and be notified of enemy death
-    public float health = 5;
-    public float speed = 3f;
+    public float MaxHealth = 5;
+    public float health;
+
     public float coinWorth = 1;
 
     public GameObject Player;
 
-    public List<Transform> wayPointList;
-    public Transform startPoint;
+    public Slider slider;
+    public GameObject healthBarUI;
 
     private Animator animator;
     private int targetWaypointIndex;
-    private bool isback = false;
-    private bool isfront = false;
 
-    private bool keepMoving = true;
+    public Transform[] TargetList;
+    public Transform[] TargetListT;
+    public Transform Target;
+    private NavMeshAgent agent;
 
-    private Quaternion mRotation;
-    // NOTE! This code should work for any speed value (large or small)
+    private Transform[] currentList;
 
+    private Vector3 TargetPosition;
     //-----------------------------------------------------------------------------
     void Start()
     {
-        // todo #2
-        transform.position = startPoint.position;
-        mRotation = transform.rotation;
         animator = GetComponent<Animator>();
-        targetWaypointIndex = 0;
+        
+        agent = GetComponent<NavMeshAgent>();
+
+        //mRotation = transform.rotation;
+        //targetWaypointIndex = 0;
+        float randomNumber = Random.Range(0, 4);
+        
+        if(randomNumber <= 2)
+        {
+            currentList = TargetListT;
+            health = 3;
+            MaxHealth = 3;
+        }
+        else
+        {
+            currentList = TargetList;
+        }
+
+        //health = MaxHealth;
+        slider.value = CalculateHealth();
+
+        healthBarUI.SetActive(false);
     }
 
     //-----------------------------------------------------------------------------
     void Update()
     {
-        if (targetWaypointIndex < 6)
+        
+        slider.value = CalculateHealth();
+        
+        if(health < MaxHealth)
+        {
+            healthBarUI.SetActive(true);
+        }
+
+        if (targetWaypointIndex < currentList.Length)
+        {
+            TargetPosition = GetNaveMeshPosition(currentList[targetWaypointIndex].position);
+            agent.SetDestination(TargetPosition);
+        }
+
+        if (targetWaypointIndex < currentList.Length / 2)
         {
             animator.SetTrigger("Run");
         }
 
-        if (targetWaypointIndex > 6)
+        if (targetWaypointIndex >= currentList.Length / 2)
         {
             animator.SetTrigger("RunFast");
-            speed = 8;
-        }
-
-        //todo #3 Move towards the next waypoint
-        if (targetWaypointIndex < wayPointList.Count && keepMoving == true)
-        {
-            Vector3 targetPosition = wayPointList[targetWaypointIndex].position;
-            Vector3 movementDir = (targetPosition - transform.position).normalized;
-            transform.position += movementDir * speed * Time.deltaTime;
-            Vector3 targetToEnemy =(transform.position - targetPosition).normalized;
-            var wayPointLeft = new Vector3(wayPointList[targetWaypointIndex].position.x - 10f, wayPointList[targetWaypointIndex].position.y, wayPointList[targetWaypointIndex].position.z);
-            var fromLeftToWayPoint = (wayPointLeft - wayPointList[targetWaypointIndex].position).normalized;
-            float dotResult = Vector3.Dot(targetToEnemy, fromLeftToWayPoint);
-            //Debug.Log(dotResult);
-            checkDirection(dotResult);
+            agent.speed = 4;
         }
 
         if(health <= 0)
         {
             animator.SetTrigger("Death");
-            keepMoving = false;
+            agent.speed = 0;
         }
-
-        if(targetWaypointIndex == wayPointList.Count - 1)
-        {
-            animator.SetTrigger("Win");
-        }
-
-        // todo #4 Check if destination reaches or passed and change target
     }
 
     //-----------------------------------------------------------------------------
-    private void TargetNextWaypoint()
-    {
-    }
-
     public void takeDamage(float Damage)
     {
+        slider.value = CalculateHealth();
+
         health -= Damage;
     }
     public void Death(float worthCoin)
@@ -93,38 +102,56 @@ public class EnemyDemo : MonoBehaviour
         Player.GetComponent<PlayerData>().SendMessage("addMoney", coinWorth);
     }
 
-    private void checkDirection(float dotResult)
+    Vector3 GetNaveMeshPosition(Vector3 samplePosition)
     {
-        if (dotResult < 0)
+        NavMesh.SamplePosition(samplePosition, out NavMeshHit hitInfo, 100f, -1);
+        return hitInfo.position;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+
+        if (other.CompareTag("GetDamage") && health > 0)
         {
-            if(isback == true)
-                transform.rotation = new Quaternion(mRotation.x, mRotation.y, mRotation.z, mRotation.w);
-            isback = true;
-            if (isfront == true)
-            {
-                targetWaypointIndex++;
-                isback = false;
-                isfront = false;
-            }
-        }
-        else if (dotResult > 0)
-        {
-            if(isfront == true)
-                transform.rotation = new Quaternion(mRotation.x, -mRotation.y, mRotation.z, mRotation.w);
-            isfront = true;
-            if (isback == true)
-            {
-                targetWaypointIndex++;
-                isback = false;
-                isfront = false;
-            }
-        }
-        else if (dotResult == 0)
-        {
-            targetWaypointIndex++;
-            isback = false;
-            isfront = false;
+            Player.GetComponent<PlayerData>().SendMessage("takeDamage", 1);
+            animator.SetTrigger("Win");
         }
 
+        if (other.CompareTag("wayPoint"))
+        {
+            targetWaypointIndex = targetWaypointIndex + 1;
+
+            if (targetWaypointIndex >= currentList.Length)
+            {
+                agent.SetDestination(Target.position);
+            }
+
+        }
+
+        if(other.CompareTag("Tower"))
+        {
+            other.GetComponentInParent<Tower>().EnterTrigger(gameObject);
+        }
+
+    }
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Tower"))
+        {
+            other.GetComponentInParent<Tower>().LeaveTrigger(gameObject);
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.CompareTag("Tower"))
+        {
+            other.GetComponentInParent<Tower>().EnterTrigger(gameObject);
+        }
+    }
+
+    private float CalculateHealth()
+    {
+        return health / MaxHealth;
     }
 }
