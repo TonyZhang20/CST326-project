@@ -48,7 +48,7 @@ public class PlayerData : MonoBehaviour
 
         showHealth();
 
-        if (health < 0)
+        if (health <= 0)
         {
             lose();
         }
