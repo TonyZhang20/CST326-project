@@ -14,6 +14,9 @@ public class PlayerData : MonoBehaviour
     public TextMeshProUGUI tHealth;
     public TextMeshProUGUI Money;
 
+    private float totalTime = 3;
+    private float accumulativeTime = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -25,7 +28,19 @@ public class PlayerData : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (health <= 0)
+        {
+            accumulativeTime += Time.deltaTime;
+            if (accumulativeTime > 1f)
+            {
+                totalTime -= 1;
+                accumulativeTime = 0;
+            }
+            if(totalTime <= 0)
+            {
+                lose();
+            }
+        }
     }
 
     public void addMoney(float coin)
@@ -47,11 +62,6 @@ public class PlayerData : MonoBehaviour
         health -= damage;
 
         showHealth();
-
-        if (health <= 0)
-        {
-            lose();
-        }
     }
 
     private void lose()

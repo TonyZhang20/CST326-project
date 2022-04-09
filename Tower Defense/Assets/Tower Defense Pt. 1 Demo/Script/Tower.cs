@@ -9,7 +9,7 @@ public class Tower : MonoBehaviour
     public float Speed;
 
     public AudioClip audioClip;
-
+    public GameObject Player;
     private List<GameObject> EnemyList = new List<GameObject>();
 
     private float accumulatedTime = 0f;
@@ -21,11 +21,17 @@ public class Tower : MonoBehaviour
     {
         ParticleSystem = transform.Find("Sphere").transform.Find("SmallExplosion").GetComponent<ParticleSystem>();
         ParticleSystem.Stop();
+        
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(Player.GetComponent<PlayerData>().health <= 0)
+        {
+            Destory();
+        }
+
         List<GameObject> list = new List<GameObject>();
 
         foreach (var enemy in EnemyList)
@@ -102,6 +108,11 @@ public class Tower : MonoBehaviour
         
         var AudioSource = GetComponent<AudioSource>();
         AudioSource.Play();
+    }
+
+    public void Destory()
+    {
+        Destroy(gameObject);
     }
 
 
